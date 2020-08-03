@@ -38,12 +38,22 @@ function useProvideFirebase() {
   const signout = async () => {
     await firebase.auth().signOut();
   };
+  
+  const changePassword = async (newPassword) => {
+    await user.updatePassword(newPassword)
+  }
+
+  const resetPassword = async (email) => {
+    await firebase.auth().sendPasswordResetEmail(email)
+  }
 
   return {
     user,
     register,
     login,
     signout,
+    changePassword,
+    resetPassword,
   };
 }
 

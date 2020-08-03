@@ -15,7 +15,8 @@ const MainLayout = styled(Layout)`
 const TextLayout = styled.div``;
 
 function Login() {
-  const { login } = useFirebase();
+  const { login, resetPassword } = useFirebase();
+  const [passResetMode, setPassResetMode] = React.useState(false);
   const navigate = useNavigate();
 
   const onFormFinish = async (values) => {
@@ -28,47 +29,90 @@ function Login() {
     }
   };
 
+  const onResetPasswordClick = async (values) => {
+    try{
+      await resetPassword(values.email);
+      message.success("Password reset link has been sent to your email")
+    } catch(error){
+      message.error(error.message);
+    }
+  }
+
   return (
     <MainLayout>
-      <PageHeader title="Login" />
-      <Form onFinish={onFormFinish}>
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            {
-              required: true,
-              type: "email",
-              message: "Please input your email!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
+      {passResetMode? (
+        <>
+        <PageHeader title="Password reset" />
+        <Form onFinish={onResetPasswordClick}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                type: "email",
+                message: "Please input your email!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+  
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Reset
+            </Button>
+          </Form.Item>
+        </Form>
+      </>
+      ):
+      (
+      <>
+        <PageHeader title="Login" />
+        <Form onFinish={onFormFinish}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                type: "email",
+                message: "Please input your email!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
-        >
-          <Input.Password />
-        </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Login
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
 
-      <TextLayout>
-        Don't have login yet? Register <Link to="/register">here</Link>
-      </TextLayout>
+        <TextLayout>
+          Don't have login yet? Register <Link to="/register">here</Link>
+        </TextLayout>
+
+        <TextLayout>
+          Forgot your password? Click <a onClick={() => setPassResetMode(true)}>here</a>
+        </TextLayout>
+      </>
+      )}
     </MainLayout>
   );
 }
